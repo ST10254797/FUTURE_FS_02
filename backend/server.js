@@ -1,9 +1,6 @@
-const express = require("express");
-const cors = require("cors");
-require("dotenv").config();
-
-const connectDB = require("./config/db");
-const leadRoutes = require("./routes/leadRoutes");
+import express from "express";
+import cors from "cors";
+import leadsRoutes from "./routes/leadsRoutes.js";
 
 const app = express();
 
@@ -11,13 +8,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect Database
-connectDB();
-
 // Routes
-app.use("/api/leads", leadRoutes);
+app.use("/api/leads", leadsRoutes);
 
-// Start Server
-app.listen(process.env.PORT, () => {
-  console.log(`✅ Server running on http://localhost:${process.env.PORT}`);
+const PORT = 5000;
+
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
