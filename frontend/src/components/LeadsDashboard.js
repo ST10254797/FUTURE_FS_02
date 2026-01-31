@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
+// Simple debounce function
+function debounce(func, delay) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), delay);
+  };
+}
+
 const LeadsDashboard = () => {
   const [leads, setLeads] = useState([]);
 
@@ -19,7 +28,7 @@ const LeadsDashboard = () => {
     fetchLeads();
   }, []);
 
-  // Update lead (status or notes)
+  // Update lead status or notes
   const updateLead = async (id, status, notes) => {
     try {
       await axios.put(`http://localhost:5000/api/leads/${id}`, {
@@ -31,6 +40,9 @@ const LeadsDashboard = () => {
       console.error("❌ ERROR UPDATING LEAD:", err);
     }
   };
+
+  // Debounced version for notes (wait 1 second after typing)
+  const debouncedUpdate = debounce(updateLead, 1000);
 
   // Delete lead
   const deleteLead = async (id) => {
@@ -72,7 +84,7 @@ const LeadsDashboard = () => {
                 <select
                   value={lead.status}
                   onChange={(e) =>
-                    updateLead(lead.id, e.target.value, lead.notes || "")
+                    updateLead(lead.id, e.target.value, lead.notes)
                   }
                 >
                   <option value="new">New</option>
@@ -84,14 +96,16 @@ const LeadsDashboard = () => {
               {/* Notes textarea */}
               <td>
                 <textarea
-                  value={lead.notes || ""}
-                  placeholder="Add notes..."
+                  defaultValue={lead.notes || ""}
                   onChange={(e) =>
-                    updateLead(lead.id, lead.status, e.target.value)
+                    debouncedUpdate(lead.id, lead.status, e.target.value)
                   }
+                  rows={2}
+                  cols={20}
                 />
               </td>
 
+              {/* Delete button */}
               <td>
                 <button onClick={() => deleteLead(lead.id)}>Delete</button>
               </td>
