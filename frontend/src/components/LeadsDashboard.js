@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-// Simple debounce function
+// Simple debounce function to delay API calls
 function debounce(func, delay) {
   let timeout;
   return (...args) => {
@@ -12,6 +12,7 @@ function debounce(func, delay) {
 
 const LeadsDashboard = () => {
   const [leads, setLeads] = useState([]);
+  const [newLead, setNewLead] = useState({ name: "", email: "", source: "" });
 
   // Fetch leads from backend
   const fetchLeads = async () => {
@@ -23,18 +24,27 @@ const LeadsDashboard = () => {
     }
   };
 
-  // Load leads on page load
+  // Load leads on component mount
   useEffect(() => {
     fetchLeads();
   }, []);
 
+  // Add new lead
+  const addLead = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:5000/api/leads", newLead);
+      setNewLead({ name: "", email: "", source: "" }); // reset form
+      fetchLeads(); // refresh table
+    } catch (err) {
+      console.error("❌ ERROR ADDING LEAD:", err);
+    }
+  };
+
   // Update lead status or notes
   const updateLead = async (id, status, notes) => {
     try {
-      await axios.put(`http://localhost:5000/api/leads/${id}`, {
-        status,
-        notes,
-      });
+      await axios.put(`http://localhost:5000/api/leads/${id}`, { status, notes });
       fetchLeads(); // refresh table
     } catch (err) {
       console.error("❌ ERROR UPDATING LEAD:", err);
@@ -58,6 +68,32 @@ const LeadsDashboard = () => {
     <div style={{ padding: "30px" }}>
       <h1>Mini CRM Dashboard</h1>
 
+      {/* ================= Add Lead Form ================= */}
+      <form onSubmit={addLead} style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Name"
+          value={newLead.name}
+          onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={newLead.email}
+          onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Source"
+          value={newLead.source}
+          onChange={(e) => setNewLead({ ...newLead, source: e.target.value })}
+        />
+        <button type="submit">Add Lead</button>
+      </form>
+
+      {/* ================= Leads Table ================= */}
       <table border="1" cellPadding="10">
         <thead>
           <tr>
@@ -83,9 +119,7 @@ const LeadsDashboard = () => {
               <td>
                 <select
                   value={lead.status}
-                  onChange={(e) =>
-                    updateLead(lead.id, e.target.value, lead.notes)
-                  }
+                  onChange={(e) => updateLead(lead.id, e.target.value, lead.notes)}
                 >
                   <option value="new">New</option>
                   <option value="contacted">Contacted</option>
@@ -97,9 +131,7 @@ const LeadsDashboard = () => {
               <td>
                 <textarea
                   defaultValue={lead.notes || ""}
-                  onChange={(e) =>
-                    debouncedUpdate(lead.id, lead.status, e.target.value)
-                  }
+                  onChange={(e) => debouncedUpdate(lead.id, lead.status, e.target.value)}
                   rows={2}
                   cols={20}
                 />
