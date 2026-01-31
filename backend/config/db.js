@@ -1,4 +1,7 @@
 import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+
+dotenv.config(); // ✅ Load .env variables
 
 export const db = mysql.createPool({
   host: process.env.DB_HOST,
@@ -7,4 +10,5 @@ export const db = mysql.createPool({
   database: process.env.DB_NAME,
 });
 
-console.log("✅ MySQL Pool Created");
+console.log("✅ MySQL Pool Created Successfully");
+console.log("DB USER =", process.env.DB_USER);

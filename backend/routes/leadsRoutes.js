@@ -11,7 +11,12 @@ router.get("/", async (req, res) => {
     const [rows] = await db.query("SELECT * FROM leads");
     res.json(rows);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching leads", error });
+    console.log("❌ ERROR FETCHING LEADS:", error);
+
+    res.status(500).json({
+      message: "Error fetching leads",
+      error: error.message,
+    });
   }
 });
 
@@ -32,7 +37,12 @@ router.post("/", async (req, res) => {
       leadId: result.insertId,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error adding lead", error });
+    console.log("❌ ERROR ADDING LEAD:", error);
+
+    res.status(500).json({
+      message: "Error adding lead",
+      error: error.message,
+    });
   }
 });
 
@@ -51,7 +61,12 @@ router.put("/:id", async (req, res) => {
 
     res.json({ message: "✅ Lead updated successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error updating lead", error });
+    console.log("❌ ERROR UPDATING LEAD:", error);
+
+    res.status(500).json({
+      message: "Error updating lead",
+      error: error.message,
+    });
   }
 });
 
@@ -63,9 +78,15 @@ router.delete("/:id", async (req, res) => {
 
   try {
     await db.query("DELETE FROM leads WHERE id = ?", [id]);
+
     res.json({ message: "✅ Lead deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting lead", error });
+    console.log("❌ ERROR DELETING LEAD:", error);
+
+    res.status(500).json({
+      message: "Error deleting lead",
+      error: error.message,
+    });
   }
 });
 
