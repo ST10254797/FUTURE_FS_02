@@ -1,12 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import LeadsDashboard from "./components/LeadsDashboard";
+import AdminLogin from "./components/AdminLogin";
 
-function App() {
+
+const App = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
   return (
     <div>
-      <LeadsDashboard />
+      {!loggedIn ? (
+        <AdminLogin onLogin={() => setLoggedIn(true)} />
+      ) : (
+        <LeadsDashboard />
+      )}
     </div>
   );
-}
+};
 
 export default App;

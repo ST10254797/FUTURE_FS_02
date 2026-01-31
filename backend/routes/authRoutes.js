@@ -5,18 +5,21 @@ const router = express.Router();
 
 // Temporary "admin" credentials (hash the password for security)
 const ADMIN_USER = "admin";
-const ADMIN_PASSWORD_HASH = "$2b$10$CwTycUXWue0Thq9StjUM0uJ8wV8vFz0tX/z2e2xPpP9kQfH/0GZ1K"; 
-// password: "admin123" hashed
+
+// Use the hash you just generated
+const ADMIN_PASSWORD_HASH = "$2b$10$mZDtXgVZBgDyNr5xUMDVz.DSMGbfTWA6KyU8axNBMMUl4201S3M8C";
 
 // POST /api/auth/login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    // Check username
     if (username !== ADMIN_USER) {
       return res.status(401).json({ message: "Invalid username" });
     }
 
+    // Check password
     const valid = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
     if (!valid) {
       return res.status(401).json({ message: "Invalid password" });
